@@ -802,6 +802,7 @@ Ranges of the rendered text to paint behind the glyphs, such as the sentence and
 
 - **Drawn, not styled:** selection, copy, measuring and accessibility do not change, and a change of `highlights` does not render the Markdown again, so moving a highlight word by word is cheap.
 - **Colors:** use translucent colors so the selection shows through. `PlatformColor` and `DynamicColorIOS` are not supported.
+- **Ignored entries:** an entry with an empty range or a color that is not supported draws nothing. It still counts, so the entries after it keep their index in [`onHighlightLayout`](#onhighlightlayout).
 - **Code blocks and tables:** with `flavor="github"`, the whole block is tinted.
 - **Renders:** a render keeps the offsets. When the text changes, map them again from the new `onRenderedTextChange` text.
 
@@ -834,7 +835,7 @@ iOS and Android only.
 
 ### `onRenderedTextChange`
 
-Callback fired after each render with the text as the view shows it, which [`highlights`](#highlights) offsets index into. It differs from the Markdown source (list markers, quotes and code fences are not in it) and can differ between iOS and Android, so read it on each platform rather than computing it. Blocks are joined with `\n`; a table's cells are joined with tabs and its rows with newlines.
+Callback fired with the text as the view shows it: once after the first render, then whenever a render changes that text or its blocks. A render that keeps both, such as `**Hello**` becoming `Hello`, does not fire it. The text is what [`highlights`](#highlights) offsets index into. It differs from the Markdown source (list markers, quotes and code fences are not in it) and can differ between iOS and Android, so read it on each platform rather than computing it. Blocks are joined with `\n`; a table's cells are joined with tabs and its rows with newlines.
 
 With `flavor="commonmark"` there is one block, and [`onTextPress`](#ontextpress) indexes into the same text. With `flavor="github"`, `onTextPress` indexes into one block's text; add that block's `start`.
 
